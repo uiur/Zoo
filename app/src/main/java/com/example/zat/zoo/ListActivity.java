@@ -78,7 +78,7 @@ public class ListActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
           Intent intent = new Intent(view.getContext(), EditActivity.class);
-          intent.putExtra("NAME", item.name);
+          intent.putExtra("ID", item.id);
           startActivity(intent);
         }
       });
@@ -89,5 +89,4 @@ public class ListActivity extends AppCompatActivity {
       return items.size();
     }
   }
-
 }

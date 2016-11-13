@@ -11,6 +11,7 @@ import android.widget.EditText;
 import com.example.zat.zoo.model.Item;
 
 public class EditActivity extends AppCompatActivity {
+  private Item currentItem;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -27,11 +28,12 @@ public class EditActivity extends AppCompatActivity {
   void setItemIfNeeded() {
     Intent intent = getIntent();
     if (intent != null) {
-      String name = intent.getStringExtra("NAME");
+      int id = intent.getIntExtra("ID", -1);
 
-      if (name != null) {
-        Item item = Item.find(name);
+      if (id != -1) {
+        Item item = Item.find(id);
         if (item == null) return;
+        currentItem = item;
 
         EditText nameView = (EditText) findViewById(R.id.edit_text_name);
         nameView.setText(item.name);
@@ -43,12 +45,11 @@ public class EditActivity extends AppCompatActivity {
   }
 
   Item Save(String name, String body) {
-    Item item = Item.find(name);
-    if (item != null) {
-      item.name = name;
-      item.body = body;
+    if (currentItem != null) {
+      currentItem.name = name;
+      currentItem.body = body;
 
-      return item;
+      return currentItem;
     }
 
     Item newItem = new Item(name, body);
