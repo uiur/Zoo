@@ -67,7 +67,7 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-      Item item = items.get(position);
+      final Item item = items.get(position);
       TextView nameTextView = (TextView) holder.view.findViewById(R.id.card_view_name);
       TextView bodyTextView = (TextView) holder.view.findViewById(R.id.card_view_body);
 
@@ -78,6 +78,7 @@ public class ListActivity extends AppCompatActivity {
         @Override
         public void onClick(View view) {
           Intent intent = new Intent(view.getContext(), EditActivity.class);
+          intent.putExtra("NAME", item.name);
           startActivity(intent);
         }
       });

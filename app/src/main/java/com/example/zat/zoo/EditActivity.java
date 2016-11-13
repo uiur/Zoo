@@ -16,12 +16,45 @@ public class EditActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_edit);
+    setItemIfNeeded();
 
     Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
     setSupportActionBar(toolbar);
 
     getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+  }
 
+  void setItemIfNeeded() {
+    Intent intent = getIntent();
+    if (intent != null) {
+      String name = intent.getStringExtra("NAME");
+
+      if (name != null) {
+        Item item = Item.find(name);
+        if (item == null) return;
+
+        EditText nameView = (EditText) findViewById(R.id.edit_text_name);
+        nameView.setText(item.name);
+
+        EditText bodyView = (EditText) findViewById(R.id.edit_text_body);
+        bodyView.setText(item.body);
+      }
+    }
+  }
+
+  Item Save(String name, String body) {
+    Item item = Item.find(name);
+    if (item != null) {
+      item.name = name;
+      item.body = body;
+
+      return item;
+    }
+
+    Item newItem = new Item(name, body);
+    Item.ITEMS.add(newItem);
+
+    return newItem;
   }
 
   @Override
@@ -33,8 +66,7 @@ public class EditActivity extends AppCompatActivity {
       EditText bodyView = (EditText) findViewById(R.id.edit_text_body);
       String body = bodyView.getText().toString();
 
-      Item newItem = new Item(name, body);
-      Item.ITEMS.add(newItem);
+      Save(name, body);
 
       Intent intent = new Intent(this, ListActivity.class);
       navigateUpTo(intent);

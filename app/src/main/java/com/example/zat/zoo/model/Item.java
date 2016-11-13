@@ -1,6 +1,7 @@
 package com.example.zat.zoo.model;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 public class Item {
   public final static ArrayList<Item> ITEMS = new ArrayList<Item>() {
@@ -19,5 +20,15 @@ public class Item {
   public Item(String name, String body) {
     this.name = name;
     this.body = body;
+  }
+
+  public static Item find(String name) {
+    for (Item i : ITEMS) {
+      if (i.name.equals(name)) {
+        return i;
+      }
+    }
+
+    return null;
   }
 }
