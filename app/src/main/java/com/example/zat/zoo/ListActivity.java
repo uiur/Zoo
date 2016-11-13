@@ -1,5 +1,7 @@
 package com.example.zat.zoo;
 
+import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -29,6 +31,14 @@ public class ListActivity extends AppCompatActivity {
 
     recyclerViewAdapter = new RecyclerViewAdapter();
     recyclerView.setAdapter(recyclerViewAdapter);
+
+    FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    fab.setOnClickListener(new View.OnClickListener() {
+      @Override
+      public void onClick(View view) {
+        startActivity(new Intent(view.getContext(), EditActivity.class));
+      }
+    });
   }
 
   public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
@@ -63,6 +73,14 @@ public class ListActivity extends AppCompatActivity {
 
       nameTextView.setText(item.name);
       bodyTextView.setText(item.body);
+
+      holder.view.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View view) {
+          Intent intent = new Intent(view.getContext(), EditActivity.class);
+          startActivity(intent);
+        }
+      });
     }
 
     @Override
