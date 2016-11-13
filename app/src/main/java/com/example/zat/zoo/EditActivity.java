@@ -31,7 +31,7 @@ public class EditActivity extends AppCompatActivity {
       int id = intent.getIntExtra("ID", -1);
 
       if (id != -1) {
-        Item item = Item.find(id);
+        Item item = Item.find(this, id);
         if (item == null) return;
         currentItem = item;
 
@@ -48,12 +48,13 @@ public class EditActivity extends AppCompatActivity {
     if (currentItem != null) {
       currentItem.name = name;
       currentItem.body = body;
+      currentItem.save(this);
 
       return currentItem;
     }
 
     Item newItem = new Item(name, body);
-    Item.ITEMS.add(newItem);
+    newItem.save(this);
 
     return newItem;
   }

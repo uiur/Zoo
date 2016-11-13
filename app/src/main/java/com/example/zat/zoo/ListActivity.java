@@ -1,5 +1,6 @@
 package com.example.zat.zoo;
 
+import android.content.Context;
 import android.content.Intent;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -29,7 +30,7 @@ public class ListActivity extends AppCompatActivity {
     layoutManager = new LinearLayoutManager(this);
     recyclerView.setLayoutManager(layoutManager);
 
-    recyclerViewAdapter = new RecyclerViewAdapter();
+    recyclerViewAdapter = new RecyclerViewAdapter(this);
     recyclerView.setAdapter(recyclerViewAdapter);
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -53,8 +54,8 @@ public class ListActivity extends AppCompatActivity {
       }
     }
 
-    public RecyclerViewAdapter() {
-      items = Item.ITEMS;
+    public RecyclerViewAdapter(Context context) {
+      items = Item.getAll(context);
     }
 
     @Override
