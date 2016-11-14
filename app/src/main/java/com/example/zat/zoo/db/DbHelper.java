@@ -66,6 +66,16 @@ public class DbHelper extends SQLiteOpenHelper {
   }
 
 
+  public void deleteAll() {
+    SQLiteDatabase db = getWritableDatabase();
+    db.execSQL("drop table if exists item");
+  }
+
+  public void reset() {
+    deleteAll();
+    onCreate(getWritableDatabase());
+  }
+
   @Override
   public void onCreate(SQLiteDatabase db) {
     db.execSQL("create table item ( _id INTEGER primary key, name TEXT, body TEXT )");
@@ -73,7 +83,7 @@ public class DbHelper extends SQLiteOpenHelper {
 
   @Override
   public void onUpgrade(SQLiteDatabase db, int i, int i1) {
-    db.execSQL("drop table if exists item");
+    deleteAll();
     onCreate(db);
   }
 
