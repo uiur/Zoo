@@ -2,6 +2,8 @@ package com.example.zat.zoo;
 
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -12,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.example.zat.zoo.db.DbHelper;
 import com.example.zat.zoo.model.Item;
 
 import java.util.List;
@@ -34,12 +37,22 @@ public class ListActivity extends AppCompatActivity {
     recyclerView.setAdapter(recyclerViewAdapter);
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.setOnClickListener(new View.OnClickListener() {
-      @Override
-      public void onClick(View view) {
-        startActivity(new Intent(view.getContext(), EditActivity.class));
-      }
+    fab.setOnClickListener((View view) -> {
+      startActivity(new Intent(view.getContext(), EditActivity.class));
     });
+
+    DbHelper dbHelper = new DbHelper(this);
+    SQLiteDatabase db = dbHelper.getWritableDatabase();
+    String[] columns = {"_id", "name", "body"};
+    Cursor cursor = db.query("item", columns, null, null, null, null, null);
+
+    while (cursor.moveToNext()) {
+      System.out.println(cursor.getString(0));
+      System.out.println(cursor.getString(1));
+      System.out.println(cursor.getString(2));
+    }
+
+    cursor.close();
   }
 
   public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
