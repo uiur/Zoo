@@ -15,9 +15,11 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <activity android:name=".EditActivity"
             android:theme="@style/AppTheme.NoActionBar"
-            android:parentActivityName=".ListActivity">
+            android:parentActivityName=".ListActivity"
+            android:windowSoftInputMode="stateVisible">
 
         </activity>
     </application>

@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,7 +25,7 @@ import java.util.stream.Collectors;
 public class ListActivity extends AppCompatActivity {
   private RecyclerView recyclerView;
   private RecyclerView.LayoutManager layoutManager;
-  private RecyclerView.Adapter recyclerViewAdapter;
+  private RecyclerViewAdapter recyclerViewAdapter;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +39,21 @@ public class ListActivity extends AppCompatActivity {
     recyclerViewAdapter = new RecyclerViewAdapter(this);
     recyclerView.setAdapter(recyclerViewAdapter);
 
+    ItemTouchHelper touchHelper = new ItemTouchHelper(new  ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
+      @Override
+      public boolean onMove(RecyclerView recyclerView, RecyclerView.ViewHolder viewHolder, RecyclerView.ViewHolder target) {
+        return false;
+      }
+
+      @Override
+      public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
+        int position = viewHolder.getAdapterPosition();
+        recyclerViewAdapter.onRemove(position);
+      }
+    });
+
+    touchHelper.attachToRecyclerView(recyclerView);
+
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener((View view) -> {
       startActivity(new Intent(view.getContext(), EditActivity.class));
@@ -50,6 +66,7 @@ public class ListActivity extends AppCompatActivity {
 
   public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
     public List<Item> items;
+    private DbHelper dbHelper;
 
     public class ViewHolder extends RecyclerView.ViewHolder {
       public View view;
@@ -61,8 +78,15 @@ public class ListActivity extends AppCompatActivity {
     }
 
     public RecyclerViewAdapter(Context context) {
-      DbHelper dbHelper = new DbHelper(context);
+      dbHelper = new DbHelper(context);
       this.items = dbHelper.findAll();
+    }
+
+    public void onRemove(int position) {
+      Item item = items.get(position);
+      dbHelper.delete(item._id);
+      items.remove(position);
+      notifyItemRemoved(position);
     }
 
     @Override
@@ -93,5 +117,6 @@ public class ListActivity extends AppCompatActivity {
     public int getItemCount() {
       return items.size();
     }
+
   }
 }
