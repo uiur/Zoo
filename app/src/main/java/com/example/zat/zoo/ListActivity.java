@@ -14,10 +14,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import com.annimon.stream.Stream;
 import com.example.zat.zoo.db.DbHelper;
 import com.example.zat.zoo.model.Item;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class ListActivity extends AppCompatActivity {
   private RecyclerView recyclerView;
@@ -53,6 +55,10 @@ public class ListActivity extends AppCompatActivity {
     }
 
     cursor.close();
+
+    Stream.of("one", "two", "three")
+            .map(String::toUpperCase)
+            .forEach(System.out::println);
   }
 
   public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
