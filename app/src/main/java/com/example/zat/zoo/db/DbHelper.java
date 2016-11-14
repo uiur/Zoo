@@ -56,7 +56,7 @@ public class DbHelper extends SQLiteOpenHelper {
     SQLiteDatabase db = getWritableDatabase();
 
     Cursor cursor = db.query("item", COLUMNS, null, null, null, null, null);
-    ArrayList<Item> list = new ArrayList<Item>();
+    ArrayList<Item> list = new ArrayList<>();
     while (cursor.moveToNext()) {
       list.add(getCurrentItemByCursor(cursor));
     }

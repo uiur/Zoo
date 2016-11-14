@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class Item {
   private static int count = 0;
-  public final static ArrayList<Item> ITEMS = new ArrayList<Item>();
+  public final static ArrayList<Item> ITEMS = new ArrayList<>();
 
   public int _id;
   public String name;

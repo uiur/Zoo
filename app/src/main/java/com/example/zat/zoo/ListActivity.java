@@ -55,13 +55,7 @@ public class ListActivity extends AppCompatActivity {
     touchHelper.attachToRecyclerView(recyclerView);
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-    fab.setOnClickListener((View view) -> {
-      startActivity(new Intent(view.getContext(), EditActivity.class));
-    });
-
-    DbHelper dbHelper = new DbHelper(this);
-    List<Item> items = dbHelper.findAll();
-    Stream.of(items).map(item -> item.name).forEach(System.out::println);
+    fab.setOnClickListener(view -> startActivity(new Intent(view.getContext(), EditActivity.class)));
   }
 
   public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
