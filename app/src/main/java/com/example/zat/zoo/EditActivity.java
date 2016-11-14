@@ -8,6 +8,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.EditText;
 
+import com.example.zat.zoo.db.DbHelper;
 import com.example.zat.zoo.model.Item;
 
 public class EditActivity extends AppCompatActivity {
@@ -31,7 +32,9 @@ public class EditActivity extends AppCompatActivity {
       int id = intent.getIntExtra("ID", -1);
 
       if (id != -1) {
-        Item item = Item.find(this, id);
+        DbHelper db = new DbHelper(this);
+        Item item = db.find(id);
+
         if (item == null) return;
         currentItem = item;
 
@@ -45,18 +48,20 @@ public class EditActivity extends AppCompatActivity {
   }
 
   Item Save(String name, String body) {
+    DbHelper db = new DbHelper(this);
+
     if (currentItem != null) {
       currentItem.name = name;
       currentItem.body = body;
-      currentItem.save(this);
+      db.insert(currentItem);
 
       return currentItem;
     }
 
-    Item newItem = new Item(name, body);
-    newItem.save(this);
+    Item item = new Item(name, body);
+    db.insert(item);
 
-    return newItem;
+    return item;
   }
 
   @Override

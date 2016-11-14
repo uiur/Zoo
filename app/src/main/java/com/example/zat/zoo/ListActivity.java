@@ -44,21 +44,8 @@ public class ListActivity extends AppCompatActivity {
     });
 
     DbHelper dbHelper = new DbHelper(this);
-    SQLiteDatabase db = dbHelper.getWritableDatabase();
-    String[] columns = {"_id", "name", "body"};
-    Cursor cursor = db.query("item", columns, null, null, null, null, null);
-
-    while (cursor.moveToNext()) {
-      System.out.println(cursor.getString(0));
-      System.out.println(cursor.getString(1));
-      System.out.println(cursor.getString(2));
-    }
-
-    cursor.close();
-
-    Stream.of("one", "two", "three")
-            .map(String::toUpperCase)
-            .forEach(System.out::println);
+    List<Item> items = dbHelper.findAll();
+    Stream.of(items).map(item -> item.name).forEach(System.out::println);
   }
 
   public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
@@ -74,7 +61,8 @@ public class ListActivity extends AppCompatActivity {
     }
 
     public RecyclerViewAdapter(Context context) {
-      items = Item.getAll(context);
+      DbHelper dbHelper = new DbHelper(context);
+      this.items = dbHelper.findAll();
     }
 
     @Override
@@ -94,13 +82,10 @@ public class ListActivity extends AppCompatActivity {
       nameTextView.setText(item.name);
       bodyTextView.setText(item.body);
 
-      holder.view.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View view) {
-          Intent intent = new Intent(view.getContext(), EditActivity.class);
-          intent.putExtra("ID", item.id);
-          startActivity(intent);
-        }
+      holder.view.setOnClickListener(view -> {
+        Intent intent = new Intent(view.getContext(), EditActivity.class);
+        intent.putExtra("ID", item._id);
+        startActivity(intent);
       });
     }
 

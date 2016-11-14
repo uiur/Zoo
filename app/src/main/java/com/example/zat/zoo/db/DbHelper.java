@@ -2,36 +2,73 @@ package com.example.zat.zoo.db;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Pair;
 
+import com.example.zat.zoo.model.Item;
+
 import java.util.ArrayList;
+import java.util.List;
 
 public class DbHelper extends SQLiteOpenHelper {
   public static final int DATABASE_VERSION = 2;
+  public static final String[] COLUMNS = {"_id", "name", "body"};
 
   public DbHelper(Context context) {
     super(context, "zoo.db", null, DATABASE_VERSION);
   }
 
+  public void insert(Item item) {
+    SQLiteDatabase db = getWritableDatabase();
+
+    ContentValues values = new ContentValues();
+    values.put("name", item.name);
+    values.put("body", item.body);
+
+    if (item._id > 0) {
+      db.update("item", values, "_id = ?", new String[]{ String.valueOf(item._id) });
+      return;
+    }
+
+
+    db.insert("item", null, values);
+  }
+
+  public Item find(int _id) {
+    Cursor cursor = getWritableDatabase().query("item", COLUMNS, "_id = ?", new String[]{String.valueOf(_id)}, null, null, null, "1");
+    if (cursor.moveToFirst()) {
+      return getCurrentItemByCursor(cursor);
+    }
+
+    return null;
+  }
+
+  private Item getCurrentItemByCursor(Cursor cursor) {
+    final Item item = new Item(cursor.getString(1), cursor.getString(2));
+    item._id = cursor.getInt(0);
+
+    return item;
+  }
+
+  public List<Item> findAll() {
+    SQLiteDatabase db = getWritableDatabase();
+
+    Cursor cursor = db.query("item", COLUMNS, null, null, null, null, null);
+    ArrayList<Item> list = new ArrayList<Item>();
+    while (cursor.moveToNext()) {
+      list.add(getCurrentItemByCursor(cursor));
+    }
+    cursor.close();
+
+    return list;
+  }
+
+
   @Override
   public void onCreate(SQLiteDatabase db) {
     db.execSQL("create table item ( _id INTEGER primary key, name TEXT, body TEXT )");
-
-    ArrayList<Pair<String, String>> list = new ArrayList<Pair<String, String>>() {
-      {
-        add(new Pair<String, String>("nice name", "nice body"));
-        add(new Pair<String, String>("bad name", "bad body"));
-      }
-    };
-
-    for (Pair<String, String> pair : list) {
-      ContentValues values = new ContentValues();
-      values.put("name", pair.first);
-      values.put("body", pair.second);
-      db.insert("item", null, values);
-    }
   }
 
   @Override
