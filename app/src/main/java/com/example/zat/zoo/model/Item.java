@@ -10,11 +10,10 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Item {
-  private static int count = 0;
-  public final static ArrayList<Item> ITEMS = new ArrayList<>();
-
   public int _id;
   public String name;
   public String body;
@@ -22,5 +21,18 @@ public class Item {
   public Item(String name, String body) {
     this.name = name;
     this.body = body;
+  }
+
+  public List<String> tags() {
+    Pattern pattern = Pattern.compile("(?:^|\\s+)#(\\w+)");
+    Matcher matcher = pattern.matcher(body);
+
+    final ArrayList<String> list = new ArrayList<>();
+    while (matcher.find()) {
+      String tagName = matcher.group(1);
+      list.add(tagName);
+    }
+
+    return list;
   }
 }

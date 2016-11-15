@@ -1,26 +1,29 @@
 package com.example.zat.zoo;
 
+import android.app.Activity;
+import android.app.SearchManager;
 import android.content.Context;
 import android.content.Intent;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.LayoutInflater;
+import android.view.Menu;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
-import com.annimon.stream.Stream;
 import com.example.zat.zoo.db.DbHelper;
 import com.example.zat.zoo.model.Item;
 
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Optional;
 
 public class ListActivity extends AppCompatActivity {
   private RecyclerView recyclerView;
@@ -32,12 +35,13 @@ public class ListActivity extends AppCompatActivity {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_list);
 
+    Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+    setSupportActionBar(toolbar);
+    getSupportActionBar().setDisplayShowTitleEnabled(false);
+
     recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
     layoutManager = new LinearLayoutManager(this);
     recyclerView.setLayoutManager(layoutManager);
-
-    recyclerViewAdapter = new RecyclerViewAdapter(this);
-    recyclerView.setAdapter(recyclerViewAdapter);
 
     ItemTouchHelper touchHelper = new ItemTouchHelper(new  ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.LEFT | ItemTouchHelper.RIGHT) {
       @Override
@@ -56,6 +60,68 @@ public class ListActivity extends AppCompatActivity {
 
     FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
     fab.setOnClickListener(view -> startActivity(new Intent(view.getContext(), EditActivity.class)));
+
+    recyclerViewAdapter = new RecyclerViewAdapter(this, "");
+    recyclerView.setAdapter(recyclerViewAdapter);
+
+    handleIntent();
+  }
+
+  private void handleIntent() {
+    Intent intent = getIntent();
+    if (Intent.ACTION_SEARCH.equals(intent.getAction())) {
+      final String query = intent.getStringExtra(SearchManager.QUERY);
+      recyclerViewAdapter.onQuery(query);
+    }
+  }
+
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    getMenuInflater().inflate(R.menu.search, menu);
+
+    SearchView searchView = (SearchView) menu.findItem(R.id.search_view).getActionView();
+    searchView.setIconifiedByDefault(false);
+
+    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      @Override
+      public boolean onQueryTextSubmit(String query) {
+        recyclerViewAdapter.onQuery(query);
+        return true;
+      }
+
+      @Override
+      public boolean onQueryTextChange(String newText) {
+        if (newText.equals("")) {
+          recyclerViewAdapter.onQuery("");
+          return true;
+        }
+        return false;
+      }
+    });
+
+    View outsideFrame = findViewById(R.id.outside_frame);
+    outsideFrame.setOnTouchListener((v, e) -> {
+      searchView.clearFocus();
+      return false;
+    });
+
+    searchView.setOnQueryTextFocusChangeListener((v, focus) -> {
+
+      System.out.println(focus);
+      if (focus) {
+        outsideFrame.setVisibility(View.VISIBLE);
+      } else {
+        outsideFrame.setVisibility(View.INVISIBLE);
+      }
+    });
+
+    return true;
+  }
+
+  void hideKeyboard(View v) {
+    InputMethodManager imm = (InputMethodManager) getSystemService(INPUT_METHOD_SERVICE);
+    imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+    v.clearFocus();
   }
 
   public class RecyclerViewAdapter extends RecyclerView.Adapter<RecyclerViewAdapter.ViewHolder> {
@@ -71,9 +137,24 @@ public class ListActivity extends AppCompatActivity {
       }
     }
 
-    public RecyclerViewAdapter(Context context) {
+    public RecyclerViewAdapter(Context context, String query) {
       dbHelper = new DbHelper(context);
-      this.items = dbHelper.findAll();
+
+      updateByQuery(query);
+
+    }
+
+    private void updateByQuery(String query) {
+      if (query.length() > 0) {
+        this.items = dbHelper.search(query);
+      } else {
+        this.items = dbHelper.findAll();
+      }
+    }
+
+    public void onQuery(String query) {
+      updateByQuery(query);
+      notifyDataSetChanged();
     }
 
     public void onRemove(int position) {
@@ -113,4 +194,5 @@ public class ListActivity extends AppCompatActivity {
     }
 
   }
+
 }

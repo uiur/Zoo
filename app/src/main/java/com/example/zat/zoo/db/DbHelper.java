@@ -80,6 +80,27 @@ public class DbHelper extends SQLiteOpenHelper {
     onCreate(getWritableDatabase());
   }
 
+  public List<Item> search(String query) {
+    SQLiteDatabase db = getReadableDatabase();
+    Cursor cursor = db.query(
+            "item",
+            COLUMNS,
+            "name like ? or body LIKE ?",
+            new String[] { "%" + query + "%", "%" + query + "%" },
+            null,
+            null,
+            null
+    );
+
+    List<Item> items = new ArrayList<Item>();
+    while (cursor.moveToNext()) {
+      Item item = getCurrentItemByCursor(cursor);
+      items.add(item);
+    }
+
+    return items;
+  }
+
   @Override
   public void onCreate(SQLiteDatabase db) {
     db.execSQL("create table item ( _id INTEGER primary key, name TEXT, body TEXT )");
